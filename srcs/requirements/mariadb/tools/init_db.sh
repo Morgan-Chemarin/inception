@@ -1,22 +1,17 @@
 #!/bin/bash
 set -e
 
-# Sécurisation immédiate des dossiers requis
-mkdir -p /run/mysqld
-chown -R mysql:mysql /run/mysqld
-chown -R mysql:mysql /var/lib/mysql
-
 # Test de la condition principale
 if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 
-    if [ ! -d "/var/lib/mysql/mysql" ]; then
-        mariadb-install-db --user=mysql --datadir=/var/lib/mysql
-    fi
+    # if [ ! -d "/var/lib/mysql/mysql" ]; then
+    #     mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+    # fi
 
     /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking &
     pid="$!"
 
-    until mariadb-admin ping --silent; do
+    until mariadb -u root --connect-timeout=2 -e "SELECT 1" > /dev/null 2>&1; do
         sleep 1
     done
 
@@ -32,11 +27,14 @@ DROP DATABASE IF EXISTS test;
 FLUSH PRIVILEGES;
 EOF
 
+    # docker logs mariadb
     mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SHOW DATABASES;"
     mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT User, Host FROM mysql.user;"
 
+    # on sotpe mariadb temporaire
     mariadb-admin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
     wait "$pid"
 fi
 
+# on lance mariadb en pid 1
 exec /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql

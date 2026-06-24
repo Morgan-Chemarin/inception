@@ -19,5 +19,3 @@ RUN mkdir -p /run/mysqld && \
 EXPOSE 3306
 
 ENTRYPOINT ["/usr/local/bin/init_db.sh"]
-
-CMD ["mysqld", "--user=mysql"]

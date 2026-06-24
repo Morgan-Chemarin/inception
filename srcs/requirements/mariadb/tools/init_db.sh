@@ -1,38 +1,42 @@
 #!/bin/bash
+set -e
 
+# Sécurisation immédiate des dossiers requis
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 chown -R mysql:mysql /var/lib/mysql
 
-# MYSQL_ROOT_PASSWORD=rtmchemari
-# MYSQL_PASSWORD=wpmchemari
+# Test de la condition principale
+if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+    if [ ! -d "/var/lib/mysql/mysql" ]; then
+        mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+    fi
 
     /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking &
+    pid="$!"
 
     until mariadb-admin ping --silent; do
         sleep 1
     done
 
-    #  change le mdp root
-    # cree database wordpress
-    mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS '${MYSQL_DATABASE}';"
+    mariadb -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'localhost';
+DELETE FROM mysql.user WHERE User='';
+DROP DATABASE IF EXISTS test;
+FLUSH PRIVILEGES;
+EOF
 
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';"
-
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'localhost';"
-
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "DELETE FROM mysql.user WHERE User='';"
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "DROP DATABASE IF EXXISTS test;"
-
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "FLUSH PRIVILEGES;"
+    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SHOW DATABASES;"
+    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT User, Host FROM mysql.user;"
 
     mariadb-admin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
+    wait "$pid"
 fi
 
-exec /usr/sbin/mariadbd
+exec /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql

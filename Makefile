@@ -33,7 +33,7 @@ re: fclean all
 
 shell-%:
 	@echo "Connexion au shell du conteneur $*..."
-	@$(COMPOSE) exec $* sh
+	@$(COMPOSE) exec $* sh || true
 
 build-%:
 	@echo "🔧 Re-build spécifique du conteneur $*..."

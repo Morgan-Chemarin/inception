@@ -43,6 +43,7 @@ if [ ! -f "wp-config.php" ]; then
 fi
 
 # on donne le own a lutilisateur
+# comme docker est en route mais php-FPM tourne sur www-data
 chown -R www-data:www-data /var/www/wordpress
 
 # /run/php recquis pour que php-fpm tourne proprement

@@ -9,6 +9,9 @@ services:
     restart: always
     networks:
       - inception_net
+    secrets:
+      - db_password
+      - db_root_password
 
 volumes:
   mariadb:
@@ -21,3 +24,9 @@ volumes:
 networks:
   inception_net:
     driver: bridge
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  db_root_password:
+    file: ./secrets/db_root_password.txt

@@ -3,10 +3,12 @@ services:
     build: ./requirements/mariadb
     container_name: mariadb
     image: mariadb
-    env_file: .env
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - mariadb:/var/lib/mysql
-    restart: always
+    restart: on-failure
     networks:
       - inception_net
     secrets:

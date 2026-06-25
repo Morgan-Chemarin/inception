@@ -1,8 +1,13 @@
 #!/bin/sh
 set -e
 
-mkdir -p /var/www/wordpress
-cd /var/www/wordpress
+mkdir -p /var/www/html
+cd /var/www/html
+
+# pour attendre que mariadb soit up
+until mysqladmin ping -h"mariadb" --silent; do
+    sleep 1
+done
 
 # secrets
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
@@ -44,7 +49,8 @@ fi
 
 # on donne le own a lutilisateur
 # comme docker est en route mais php-FPM tourne sur www-data
-chown -R www-data:www-data /var/www/wordpress
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
 
 # /run/php recquis pour que php-fpm tourne proprement
 mkdir -p /run/php

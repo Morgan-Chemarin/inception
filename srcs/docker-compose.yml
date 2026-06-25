@@ -30,7 +30,7 @@ services:
       - WP_USER=${WP_USER}
       - WP_USER_EMAIL=${WP_USER_EMAIL}
     volumes:
-      - wordpress_data:/var/www/wordpress
+      - wordpress_data:/var/www/html
     networks:
       - inception_net
     secrets:

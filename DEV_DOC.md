@@ -19,5 +19,5 @@ docker named volume
 
 
 docker network
-
-
+les containers nginx et wordpress partagent le meme volume ducoup:
+wordpress execute son index.php (/var/www/html) et va chercher les infos dans mariadb ->  tranforme en html pur et envoyer a nginx qui peut le diffuser au navigateur

@@ -40,6 +40,20 @@ services:
     depends_on:
       - mariadb
 
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    image: nginx
+    restart: on-failure
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception_net
+    depends_on:
+      - wordpress
+
 volumes:
   mariadb:
     driver: local

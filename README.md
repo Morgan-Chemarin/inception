@@ -68,7 +68,7 @@ make clean
 
 * **Wipe Containers, Networks, and All Local Data Volumes:**
 ```bash
-make clean
+make fclean
 ```
 
 ---

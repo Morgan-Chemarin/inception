@@ -7,7 +7,7 @@ This technical documentation details the architecture setup, deployment commands
 ## 1. Environment Setup from Scratch
 
 ### Prerequisites
-The infrastructure is built to run inside a dedicated Virtual Machine (VM) running either **Debian**. Ensure the following packages are installed on the host:
+The infrastructure is built to run inside a dedicated Virtual Machine (VM) running **Debian**. Ensure the following packages are installed on the host:
 * `make`
 * `docker.io`
 * `docker-compose`
@@ -40,7 +40,17 @@ To secure production credentials, environment files and text secrets are explici
 
 ```env
 MYSQL_DATABASE=wordpress
-MYSQL_USER=wp_user
+MYSQL_USER=wpuser
+
+
+WP_URL=mchemari.42.fr
+WP_TITLE=Inception_mchemari
+
+WP_ADMIN_USER=mchemari_boss
+WP_ADMIN_EMAIL=admin@42.fr
+
+WP_USER=mchemari
+WP_USER_EMAIL=mchemari@student.42.fr
 ```
 
 2. 

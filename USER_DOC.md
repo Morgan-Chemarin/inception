@@ -25,9 +25,14 @@ make
 make down
 ```
 
-* **To stop services and completely purge all data (including volumes):**
+* **To stop services:**
 ```bash
 make clean
+```
+
+* **To stop services and completely purge all data (including volumes):**
+```bash
+make fclean
 ```
 
 ---

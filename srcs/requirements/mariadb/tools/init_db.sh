@@ -8,10 +8,6 @@ MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 # Test de la condition principale
 if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 
-    # if [ ! -d "/var/lib/mysql/mysql" ]; then
-    #     mariadb-install-db --user=mysql --datadir=/var/lib/mysql
-    # fi
-
     /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking &
     pid="$!"
 
@@ -30,10 +26,6 @@ DELETE FROM mysql.user WHERE User='';
 DROP DATABASE IF EXISTS test;
 FLUSH PRIVILEGES;
 EOF
-
-    # docker logs mariadb
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SHOW DATABASES;"
-    mariadb -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT User, Host FROM mysql.user;"
 
     # on sotpe mariadb temporaire
     mariadb-admin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown

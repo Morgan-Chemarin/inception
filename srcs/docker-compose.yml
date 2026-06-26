@@ -8,7 +8,7 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
-      - mariadb:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     networks:
       - inception_net
     secrets:
@@ -55,13 +55,15 @@ services:
       - wordpress
 
 volumes:
-  mariadb:
+  mariadb_data:
+    name: mariadb_data
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /home/mchemari/data/mariadb
   wordpress_data:
+    name: wordpress_data
     driver: local
     driver_opts:
       type: none
@@ -70,6 +72,7 @@ volumes:
 
 networks:
   inception_net:
+    name: inception_net
     driver: bridge
 
 secrets:

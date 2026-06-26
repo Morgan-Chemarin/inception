@@ -4,24 +4,18 @@ set -e
 mkdir -p /var/www/html
 cd /var/www/html
 
-# pour attendre que mariadb soit up
 until mysqladmin ping -h"mariadb" --silent; do
     sleep 1
 done
 
-# secrets
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 
-# si wp est pas installe
 if [ ! -f "wp-config.php" ]; then
 
-    # dl des fichiers src de wp
     wp core download --allow-root
 
-    # generation wp-config.php
-    # docker network (DNS ?) permet de contacter les containers par leur nom + port
     wp config create \
         --dbname="${MYSQL_DATABASE}" \
         --dbuser="${MYSQL_USER}" \
@@ -29,7 +23,6 @@ if [ ! -f "wp-config.php" ]; then
         --dbhost="mariadb:3306" \
         --allow-root
 
-    # installation du site et creation compte admin
     wp core install \
         --url="${WP_URL}" \
         --title="${WP_TITLE}" \
@@ -38,7 +31,6 @@ if [ ! -f "wp-config.php" ]; then
         --admin_email="${WP_ADMIN_EMAIL}" \
         --allow-root
 
-    # creation user classique
     wp user create \
         "${WP_USER}" \
         "${WP_USER_EMAIL}" \
@@ -47,13 +39,9 @@ if [ ! -f "wp-config.php" ]; then
         --allow-root
 fi
 
-# on donne le own a lutilisateur
-# comme docker est en route mais php-FPM tourne sur www-data
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
-# /run/php recquis pour que php-fpm tourne proprement
 mkdir -p /run/php
 
-#  PHP-FPM au premier plan ( -F pour forcer le premier plan )
 exec /usr/sbin/php-fpm8.2 -F

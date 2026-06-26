@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
-# on recupere les valeurs brutes cache dans les secrets
 MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 
-# Test de la condition principale
 if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 
     /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking &
@@ -27,10 +25,8 @@ DROP DATABASE IF EXISTS test;
 FLUSH PRIVILEGES;
 EOF
 
-    # on sotpe mariadb temporaire
     mariadb-admin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
     wait "$pid"
 fi
 
-# on lance mariadb en pid 1
 exec /usr/sbin/mariadbd --user=mysql --datadir=/var/lib/mysql
